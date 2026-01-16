@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katakana Speed Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .mode-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .mode-button {
+            padding: 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .mode-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .mode-button.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .game-area {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        .character-display {
+            font-size: 120px;
+            font-weight: 300;
+            margin: 30px 0;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .option-button {
+            padding: 20px;
+            font-size: 1.2em;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .option-button:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .option-button.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .option-button.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .feedback {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin: 20px 0;
+            min-height: 30px;
+        }
+
+        .feedback.correct {
+            color: #4caf50;
+        }
+
+        .feedback.incorrect {
+            color: #f44336;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .timer {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .level-indicator {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .word-display {
+            font-size: 80px;
+            font-weight: 300;
+            margin: 30px 0;
+            letter-spacing: 10px;
+        }
+
+        .controls {
+            margin-top: 30px;
+        }
+
+        .control-button {
+            padding: 15px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .primary-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .secondary-button {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .completion-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .completion-screen h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .completion-stats {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .completion-stat {
+            font-size: 1.3em;
+            margin: 15px 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>カタカナ Speed Trainer</h1>
+        <p class="subtitle">Master katakana through progressive learning and speed building</p>
+
+        <div id="menu" class="menu-screen">
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Mastered</div>
+                    <div class="stat-value" id="mastered-count">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Level</div>
+                    <div class="stat-value" id="current-level">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Best Streak</div>
+                    <div class="stat-value" id="best-streak">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Correct</div>
+                    <div class="stat-value" id="total-correct">0</div>
+                </div>
+            </div>
+
+            <div class="mode-select">
+                <button class="mode-button" onclick="startMode('learn')">
+                    📚 Learn Characters<br>
+                    <small>Basic katakana recognition</small>
+                </button>
+                <button class="mode-button" onclick="startMode('practice')">
+                    💪 Practice Mode<br>
+                    <small>Mixed review</small>
+                </button>
+                <button class="mode-button" onclick="startMode('speed')">
+                    ⚡ Speed Challenge<br>
+                    <small>Beat the clock!</small>
+                </button>
+                <button class="mode-button" onclick="startMode('words')">
+                    📖 Word Reading<br>
+                    <small>Read katakana words</small>
+                </button>
+            </div>
+        </div>
+
+        <div id="game" class="game-area">
+            <div class="level-indicator" id="level-display"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            
+            <div class="timer" id="timer"></div>
+            
+            <div class="character-display" id="character"></div>
+            <div class="word-display hidden" id="word"></div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="options" id="options"></div>
+            
+            <div class="controls">
+                <button class="control-button secondary-button" onclick="returnToMenu()">Back to Menu</button>
+            </div>
+        </div>
+
+        <div id="completion" class="completion-screen hidden">
+            <h2>🎉 Excellent Work!</h2>
+            <div class="completion-stats">
+                <div class="completion-stat">Accuracy: <strong id="final-accuracy">0%</strong></div>
+                <div class="completion-stat">Time: <strong id="final-time">0s</strong></div>
+                <div class="completion-stat">Streak: <strong id="final-streak">0</strong></div>
+            </div>
+            <button class="control-button primary-button" onclick="returnToMenu()">Back to Menu</button>
+            <button class="control-button primary-button" onclick="restartMode()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Katakana data organized by learning progression
+        const katakana = {
+            vowels: [
+                {char: 'ア', roma: 'a'}, {char: 'イ', roma: 'i'}, {char: 'ウ', roma: 'u'}, 
+                {char: 'エ', roma: 'e'}, {char: 'オ', roma: 'o'}
+            ],
+            k_row: [
+                {char: 'カ', roma: 'ka'}, {char: 'キ', roma: 'ki'}, {char: 'ク', roma: 'ku'}, 
+                {char: 'ケ', roma: 'ke'}, {char: 'コ', roma: 'ko'}
+            ],
+            s_row: [
+                {char: 'サ', roma: 'sa'}, {char: 'シ', roma: 'shi'}, {char: 'ス', roma: 'su'}, 
+                {char: 'セ', roma: 'se'}, {char: 'ソ', roma: 'so'}
+            ],
+            t_row: [
+                {char: 'タ', roma: 'ta'}, {char: 'チ', roma: 'chi'}, {char: 'ツ', roma: 'tsu'}, 
+                {char: 'テ', roma: 'te'}, {char: 'ト', roma: 'to'}
+            ],
+            n_row: [
+                {char: 'ナ', roma: 'na'}, {char: 'ニ', roma: 'ni'}, {char: 'ヌ', roma: 'nu'}, 
+                {char: 'ネ', roma: 'ne'}, {char: 'ノ', roma: 'no'}
+            ],
+            h_row: [
+                {char: 'ハ', roma: 'ha'}, {char: 'ヒ', roma: 'hi'}, {char: 'フ', roma: 'fu'}, 
+                {char: 'ヘ', roma: 'he'}, {char: 'ホ', roma: 'ho'}
+            ],
+            m_row: [
+                {char: 'マ', roma: 'ma'}, {char: 'ミ', roma: 'mi'}, {char: 'ム', roma: 'mu'}, 
+                {char: 'メ', roma: 'me'}, {char: 'モ', roma: 'mo'}
+            ],
+            y_row: [
+                {char: 'ヤ', roma: 'ya'}, {char: 'ユ', roma: 'yu'}, {char: 'ヨ', roma: 'yo'}
+            ],
+            r_row: [
+                {char: 'ラ', roma: 'ra'}, {char: 'リ', roma: 'ri'}, {char: 'ル', roma: 'ru'}, 
+                {char: 'レ', roma: 're'}, {char: 'ロ', roma: 'ro'}
+            ],
+            w_row: [
+                {char: 'ワ', roma: 'wa'}, {char: 'ヲ', roma: 'wo'}, {char: 'ン', roma: 'n'}
+            ]
+        };
+
+        const words = [
+            {word: 'コーヒー', roma: 'koohii', meaning: 'coffee'},
+            {word: 'カメラ', roma: 'kamera', meaning: 'camera'},
+            {word: 'テレビ', roma: 'terebi', meaning: 'TV'},
+            {word: 'ノート', roma: 'nooto', meaning: 'notebook'},
+            {word: 'メニュー', roma: 'menyuu', meaning: 'menu'},
+            {word: 'タクシー', roma: 'takushii', meaning: 'taxi'},
+            {word: 'ホテル', roma: 'hoteru', meaning: 'hotel'},
+            {word: 'レストラン', roma: 'resutoran', meaning: 'restaurant'},
+            {word: 'アイス', roma: 'aisu', meaning: 'ice cream'},
+            {word: 'スマホ', roma: 'sumaho', meaning: 'smartphone'}
+        ];
+
+        let gameState = {
+            mode: null,
+            currentQuestion: null,
+            score: 0,
+            total: 0,
+            streak: 0,
+            bestStreak: parseInt(localStorage.getItem('bestStreak')) || 0,
+            totalCorrect: parseInt(localStorage.getItem('totalCorrect')) || 0,
+            mastered: JSON.parse(localStorage.getItem('mastered')) || [],
+            level: parseInt(localStorage.getItem('level')) || 1,
+            startTime: null,
+            timeLimit: null,
+            timerInterval: null,
+            srsData: JSON.parse(localStorage.getItem('srsData')) || {}
+        };
+
+        // SRS intervals in "questions seen" - how many questions before reviewing again
+        const SRS_INTERVALS = [1, 3, 7, 15, 30, 60];
+
+        function initializeSRSData(character) {
+            if (!gameState.srsData[character.char]) {
+                gameState.srsData[character.char] = {
+                    interval: 0,
+                    correctCount: 0,
+                    incorrectCount: 0,
+                    lastSeen: 0,
+                    questionsSince: 0,
+                    easeFactor: 2.5 // Starting ease
+                };
+            }
+        }
+
+        function updateSRS(character, correct) {
+            initializeSRSData(character);
+            const srs = gameState.srsData[character.char];
+            
+            if (correct) {
+                srs.correctCount++;
+                // Move to next interval
+                const currentIntervalIndex = SRS_INTERVALS.indexOf(srs.interval);
+                if (currentIntervalIndex < SRS_INTERVALS.length - 1) {
+                    srs.interval = SRS_INTERVALS[currentIntervalIndex + 1];
+                } else {
+                    // Already at max, increase ease factor
+                    srs.easeFactor = Math.min(srs.easeFactor + 0.1, 3.5);
+                }
+            } else {
+                srs.incorrectCount++;
+                // Reset to first interval
+                srs.interval = SRS_INTERVALS[0];
+                srs.easeFactor = Math.max(srs.easeFactor - 0.2, 1.3);
+            }
+            
+            srs.lastSeen = gameState.total;
+            srs.questionsSince = 0;
+            
+            localStorage.setItem('srsData', JSON.stringify(gameState.srsData));
+        }
+
+        function incrementQuestionsSince() {
+            // Increment questionsSince for all characters
+            Object.keys(gameState.srsData).forEach(char => {
+                gameState.srsData[char].questionsSince++;
+            });
+        }
+
+        function getWeightedCharacter(characters) {
+            // Initialize SRS data for any new characters
+            characters.forEach(char => initializeSRSData(char));
+            
+            // Weight characters by: due for review > never seen > recently correct
+            const weights = characters.map(char => {
+                const srs = gameState.srsData[char.char];
+                
+                // Never seen - high priority
+                if (srs.lastSeen === 0) return 100;
+                
+                // Due for review based on interval
+                if (srs.questionsSince >= srs.interval) {
+                    // More overdue = higher weight
+                    const overdueBy = srs.questionsSince - srs.interval;
+                    return 50 + overdueBy * 2;
+                }
+                
+                // Recently incorrect - medium priority
+                if (srs.incorrectCount > srs.correctCount) {
+                    return 30;
+                }
+                
+                // Default low weight (recently seen and correct)
+                return 5;
+            });
+            
+            // Weighted random selection
+            const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (let i = 0; i < characters.length; i++) {
+                random -= weights[i];
+                if (random <= 0) {
+                    return characters[i];
+                }
+            }
+            
+            return characters[characters.length - 1];
+        }
+
+        function getAllCharacters() {
+            return Object.values(katakana).flat();
+        }
+
+        function getCharactersForLevel(level) {
+            const rows = Object.values(katakana);
+            const numRows = Math.min(level, rows.length);
+            return rows.slice(0, numRows).flat();
+        }
+
+        function startMode(mode) {
+            gameState.mode = mode;
+            gameState.score = 0;
+            gameState.total = 0;
+            gameState.streak = 0;
+            gameState.startTime = Date.now();
+            
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('game').classList.add('active');
+            document.getElementById('completion').classList.add('hidden');
+            
+            if (mode === 'speed') {
+                gameState.timeLimit = 60;
+                startTimer();
+            } else {
+                document.getElementById('timer').classList.add('hidden');
+            }
+            
+            updateLevelDisplay();
+            nextQuestion();
+        }
+
+        function updateLevelDisplay() {
+            const mode = gameState.mode;
+            let levelText = '';
+            
+            if (mode === 'learn') {
+                levelText = `Level ${gameState.level} - Learning Mode`;
+            } else if (mode === 'practice') {
+                levelText = 'Practice - All Learned Characters';
+            } else if (mode === 'speed') {
+                levelText = '⚡ Speed Challenge - 60 seconds';
+            } else if (mode === 'words') {
+                levelText = '📖 Word Reading Challenge';
+            }
+            
+            document.getElementById('level-display').textContent = levelText;
+        }
+
+        function startTimer() {
+            document.getElementById('timer').classList.remove('hidden');
+            
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeLimit--;
+                document.getElementById('timer').textContent = `⏱️ ${gameState.timeLimit}s`;
+                
+                if (gameState.timeLimit <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function nextQuestion() {
+            if (gameState.mode === 'words') {
+                showWordQuestion();
+            } else {
+                showCharacterQuestion();
+            }
+            
+            updateProgress();
+        }
+
+        function showCharacterQuestion() {
+            let characters;
+            
+            if (gameState.mode === 'learn') {
+                characters = getCharactersForLevel(gameState.level);
+            } else {
+                characters = getCharactersForLevel(gameState.level);
+            }
+            
+            // Use weighted selection based on SRS
+            const current = getWeightedCharacter(characters);
+            gameState.currentQuestion = current;
+            incrementQuestionsSince();
+            
+            document.getElementById('character').textContent = current.char;
+            document.getElementById('word').classList.add('hidden');
+            document.getElementById('character').classList.remove('hidden');
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            
+            // Generate options
+            const options = [current.roma];
+            while (options.length < 4) {
+                const random = characters[Math.floor(Math.random() * characters.length)];
+                if (!options.includes(random.roma)) {
+                    options.push(random.roma);
+                }
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, current.roma);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function showWordQuestion() {
+            const word = words[Math.floor(Math.random() * words.length)];
+            gameState.currentQuestion = word;
+            
+            document.getElementById('character').classList.add('hidden');
+            document.getElementById('word').classList.remove('hidden');
+            document.getElementById('word').textContent = word.word;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            
+            // Generate options
+            const options = [word.roma];
+            while (options.length < 4) {
+                const random = words[Math.floor(Math.random() * words.length)];
+                if (!options.includes(random.roma)) {
+                    options.push(random.roma);
+                }
+            }
+            
+            options.sort(() => Math.random() - 0.5);
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, word.roma);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selected, correct) {
+            gameState.total++;
+            const buttons = document.querySelectorAll('.option-button');
+            
+            if (selected === correct) {
+                gameState.score++;
+                gameState.streak++;
+                gameState.totalCorrect++;
+                
+                // Update SRS data
+                updateSRS(gameState.currentQuestion, true);
+                
+                if (gameState.streak > gameState.bestStreak) {
+                    gameState.bestStreak = gameState.streak;
+                    localStorage.setItem('bestStreak', gameState.bestStreak);
+                }
+                
+                buttons.forEach(btn => {
+                    if (btn.textContent === correct) {
+                        btn.classList.add('correct');
+                    }
+                    btn.disabled = true;
+                });
+                
+                document.getElementById('feedback').textContent = '✓ Correct!';
+                document.getElementById('feedback').className = 'feedback correct';
+                
+                // Check for level up in learn mode
+                if (gameState.mode === 'learn' && gameState.total % 10 === 0) {
+                    const accuracy = (gameState.score / gameState.total) * 100;
+                    if (accuracy >= 80 && gameState.level < Object.keys(katakana).length) {
+                        gameState.level++;
+                        localStorage.setItem('level', gameState.level);
+                        document.getElementById('feedback').textContent = '🎉 Level Up! New characters unlocked!';
+                    }
+                }
+                
+                localStorage.setItem('totalCorrect', gameState.totalCorrect);
+                updateStats();
+                
+            } else {
+                gameState.streak = 0;
+                
+                // Update SRS data
+                updateSRS(gameState.currentQuestion, false);
+                
+                buttons.forEach(btn => {
+                    if (btn.textContent === selected) {
+                        btn.classList.add('incorrect');
+                    }
+                    if (btn.textContent === correct) {
+                        btn.classList.add('correct');
+                    }
+                    btn.disabled = true;
+                });
+                
+                document.getElementById('feedback').textContent = `✗ Correct answer: ${correct}`;
+                document.getElementById('feedback').className = 'feedback incorrect';
+            }
+            
+            setTimeout(() => {
+                if (gameState.mode === 'learn' && gameState.total >= 20) {
+                    endGame();
+                } else if (gameState.mode !== 'speed') {
+                    nextQuestion();
+                } else {
+                    nextQuestion();
+                }
+            }, 750);
+        }
+
+        function updateProgress() {
+            if (gameState.mode === 'learn') {
+                const progress = (gameState.total / 20) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+            } else if (gameState.mode === 'speed') {
+                const progress = ((60 - gameState.timeLimit) / 60) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+            } else {
+                document.getElementById('progress').style.width = '100%';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('mastered-count').textContent = gameState.level * 5;
+            document.getElementById('current-level').textContent = gameState.level;
+            document.getElementById('best-streak').textContent = gameState.bestStreak;
+            document.getElementById('total-correct').textContent = gameState.totalCorrect;
+        }
+
+        function endGame() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            const accuracy = gameState.total > 0 ? Math.round((gameState.score / gameState.total) * 100) : 0;
+            const timeTaken = Math.round((Date.now() - gameState.startTime) / 1000);
+            
+            document.getElementById('final-accuracy').textContent = accuracy + '%';
+            document.getElementById('final-time').textContent = timeTaken + 's';
+            document.getElementById('final-streak').textContent = gameState.streak;
+            
+            document.getElementById('game').classList.remove('active');
+            document.getElementById('completion').classList.remove('hidden');
+        }
+
+        function returnToMenu() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            document.getElementById('game').classList.remove('active');
+            document.getElementById('completion').classList.add('hidden');
+            document.getElementById('menu').classList.remove('hidden');
+            updateStats();
+        }
+
+        function restartMode() {
+            document.getElementById('completion').classList.add('hidden');
+            startMode(gameState.mode);
+        }
+
+        // Initialize stats on page load
+        updateStats();
+    </script>
+</body>
+</html>
