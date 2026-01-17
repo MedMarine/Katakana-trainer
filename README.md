@@ -16,7 +16,7 @@ An interactive web app for learning and mastering katakana through gamification 
 
 ## Live Demo
 
-Visit the GitHub Pages site: [Your URL will be here after enabling Pages]
+Visit the site: [https://medmarine.github.io/katakana-trainer/](https://medmarine.github.io/katakana-trainer/)
 
 ## How It Works
 
