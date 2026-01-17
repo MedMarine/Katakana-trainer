@@ -335,7 +335,7 @@
             <h2>🎉 Excellent Work!</h2>
             <div class="completion-stats">
                 <div class="completion-stat">Accuracy: <strong id="final-accuracy">0%</strong></div>
-                <div class="completion-stat">Time: <strong id="final-time">0s</strong></div>
+                <div class="completion-stat"><span id="stat-label">Score:</span> <strong id="final-time">0s</strong></div>
                 <div class="completion-stat">Streak: <strong id="final-streak">0</strong></div>
             </div>
             <button class="control-button primary-button" onclick="returnToMenu()">Back to Menu</button>
@@ -753,9 +753,20 @@
             
             const accuracy = gameState.total > 0 ? Math.round((gameState.score / gameState.total) * 100) : 0;
             const timeTaken = Math.round((Date.now() - gameState.startTime) / 1000);
+            const incorrect = gameState.total - gameState.score;
             
             document.getElementById('final-accuracy').textContent = accuracy + '%';
-            document.getElementById('final-time').textContent = timeTaken + 's';
+            
+            // For speed challenge, show score instead of time
+            if (gameState.mode === 'speed') {
+                const speedScore = Math.max(0, gameState.score - (incorrect * 2));
+                document.getElementById('stat-label').textContent = 'Score:';
+                document.getElementById('final-time').textContent = speedScore + ' pts';
+            } else {
+                document.getElementById('stat-label').textContent = 'Time:';
+                document.getElementById('final-time').textContent = timeTaken + 's';
+            }
+            
             document.getElementById('final-streak').textContent = gameState.streak;
             
             document.getElementById('game').classList.remove('active');
