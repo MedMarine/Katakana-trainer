@@ -719,6 +719,8 @@
             setTimeout(() => {
                 if (gameState.mode === 'learn' && gameState.total >= 20) {
                     endGame();
+                } else if (gameState.mode === 'words' && gameState.total >= 15) {
+                    endGame();
                 } else if (gameState.mode !== 'speed') {
                     nextQuestion();
                 } else {
@@ -733,6 +735,9 @@
                 document.getElementById('progress').style.width = progress + '%';
             } else if (gameState.mode === 'speed') {
                 const progress = ((60 - gameState.timeLimit) / 60) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+            } else if (gameState.mode === 'words') {
+                const progress = (gameState.total / 15) * 100;
                 document.getElementById('progress').style.width = progress + '%';
             } else {
                 document.getElementById('progress').style.width = '100%';
